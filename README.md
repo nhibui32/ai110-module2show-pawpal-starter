@@ -89,3 +89,32 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+---
+
+## Testing PawPal+
+
+### Run the test suite
+
+```bash
+python -m pytest
+```
+
+### What the tests cover
+
+The suite in `tests/test_pawpal.py` contains **31 tests** across six areas:
+
+| Area | Tests | What is verified |
+|---|---|---|
+| Baseline | 2 | `mark_complete()` sets status and timestamp; `add_task()` increments count |
+| Sorting | 4 | Out-of-order tasks come back chronological; `"anytime"` sorts last; pending before completed |
+| Recurrence | 7 | Daily `+1 day`, weekly `+7 days`, `"once"` / `"as needed"` return `None`; auto-scheduling on completion; attributes copied correctly |
+| Conflicts | 6 | Same-pet and cross-pet collisions detected; clean schedule returns `[]`; `conflict_warnings()` returns strings and never raises; next-occurrence copies on future dates do not false-flag |
+| Filters | 6 | `filter_by_pet` isolates one pet; unknown name returns `[]`; case-insensitive match; `filter_by_status` for pending/completed; combined `filter_tasks` with time window |
+| Edge cases | 6 | Pet with no tasks; completing a `"once"` task twice returns `False` and adds no duplicate; unknown pet/description returns `False`; unknown status value returns all tasks |
+
+### Confidence level
+
+★★★★☆ (4/5)
+
+The core scheduling behaviors — sorting, recurrence, conflict detection, and filtering — are fully covered by automated tests and pass reliably. The one area not yet tested is persistence (data lives in `st.session_state` only) and the Streamlit UI layer, which would require integration or browser-level tests to verify end-to-end.
